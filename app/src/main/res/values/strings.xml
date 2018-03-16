@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">LoadViewHelperDemo</string>
+
+    <string name="net_loading">正 在 加 载 中</string>
+    <string name="net_empty">没 有 数 据 !</string>
+    <string name="net_error">网络好像有点问题,请刷新再试</string>
+    <string name="net_try">刷新重试</string>
+</resources>
