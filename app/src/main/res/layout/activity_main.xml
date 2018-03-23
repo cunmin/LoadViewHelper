@@ -6,19 +6,23 @@
     android:layout_height="match_parent"
     tools:context="com.littleyellow.loadviewhelperdemo.MainActivity">
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/content"
         android:layout_toLeftOf="@+id/loading">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </FrameLayout>
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fasdfdsafdsafdsafdsafsd"
+            android:paddingTop="50dp"/>
+    </RelativeLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <Button
         android:text="loading"

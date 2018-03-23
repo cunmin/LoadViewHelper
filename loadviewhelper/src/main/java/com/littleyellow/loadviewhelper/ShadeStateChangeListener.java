@@ -14,49 +14,48 @@ public class ShadeStateChangeListener implements StateChangeListener {
 
     @Override
     public void onShowContent(int oldState,View fromView, View toView) {
-        toView.setVisibility(View.VISIBLE);
-        finishAnimate(fromView);
+        animate(fromView,toView);
     }
 
     @Override
     public void onShowLoad(int oldState,View fromView, View toView) {
         toView.setVisibility(View.VISIBLE);
-        finishAnimate(fromView);
     }
 
     @Override
     public void onShowEmpty(int oldState,View fromView, View toView) {
         toView.setVisibility(View.VISIBLE);
-        finishAnimate(fromView);
     }
 
     @Override
     public void onShowError(int oldState,View fromView, View toView) {
         toView.setVisibility(View.VISIBLE);
-        finishAnimate(fromView);
     }
 
-    private void finishAnimate(final View view){
-//        view.clearAnimation();
-        view.setVisibility(View.VISIBLE);
-        view.animate()
+    private void animate(final View fromView, final View toView){
+        toView.setAlpha(1f);
+        toView.setVisibility(View.VISIBLE);
+
+        fromView.clearAnimation();
+        fromView.animate()
                 .alpha(0f)
                 .setDuration(500)
                 .setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-
+                        fromView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        view.setVisibility(GONE);
-                        view.setAlpha(1f);
+                        fromView.setVisibility(GONE);
+                        fromView.setAlpha(1f);
                     }
 
                     @Override
                     public void onAnimationCancel(Animator animation) {
-
+                        toView.setAlpha(1f);
+                        toView.setVisibility(View.VISIBLE);
                     }
 
                     @Override

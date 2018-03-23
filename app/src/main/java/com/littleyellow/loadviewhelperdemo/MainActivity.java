@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        LoadViewHelper.addDefaultLayoutListener(new SettingCallBack());
+        LoadViewHelper.addDefaultLayoutListener(new SettingCallBack());
         final RecyclerView recyclerView= (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
@@ -63,13 +63,20 @@ public class MainActivity extends AppCompatActivity {
                 .stateChangeListener(new ShadeStateChangeListener(){
                     @Override
                     public void onShowError(int oldState, View fromView, View toView) {
-                        super.onShowError(oldState, fromView, toView);
-                        toView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                loadViewHelper.showLoading();
-                            }
-                        });
+//                        super.onShowError(oldState, fromView, toView);
+                    }
+
+                    @Override
+                    public void onShowContent(int oldState, View fromView, View toView) {
+//                        super.onShowContent(oldState, fromView, toView);
+                    }
+
+                    @Override
+                    public void onShowEmpty(int oldState, View fromView, View toView) {
+                    }
+
+                    @Override
+                    public void onShowLoad(int oldState, View fromView, View toView) {
                     }
                 })
                 .build()
@@ -94,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public StateChangeListener StateChangeListener() {
-            return new ShadeStateChangeListener();
+        public StateChangeListener stateChangeListener() {
+            return null;
         }
     }
 }

@@ -12,6 +12,6 @@ public interface DefaultSettingCallBack {
 
     int errorLayoutRes();
 
-    StateChangeListener StateChangeListener();
+    StateChangeListener stateChangeListener();
 
 }
