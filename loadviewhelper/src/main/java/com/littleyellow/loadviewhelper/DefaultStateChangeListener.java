@@ -11,33 +11,22 @@ public class DefaultStateChangeListener implements StateChangeListener {
 
     @Override
     public void onShowContent(int oldState,View from, View to) {
-        if(null!=from) {
-            from.setVisibility(View.GONE);
-        }
-        to.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onShowLoad(int oldState,View from, View to) {
-        if(null!=from) {
-            from.setVisibility(View.GONE);
-        }
-        to.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onShowEmpty(int oldState,View from, View to) {
-        if(null!=from) {
-            from.setVisibility(View.GONE);
-        }
-        to.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onShowError(int oldState,View from, View to) {
-        if(null!=from) {
-            from.setVisibility(View.GONE);
-        }
-        to.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onCustom(int oldState, int newState, View fromView, View errorView) {
+
     }
 }

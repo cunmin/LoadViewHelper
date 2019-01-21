@@ -18,34 +18,36 @@
             android:text="fasdfdsafdsafdsafdsafsd"
             android:paddingTop="50dp"/>
     </RelativeLayout>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
 
     <Button
-        android:text="loading"
+        android:text="加载布局"
         android:id="@+id/loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"/>
     <Button
-        android:text="error"
+        android:text="错误布局"
         android:id="@+id/error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/loading"
         android:layout_alignParentRight="true"/>
     <Button
-        android:text="empty"
+        android:text="空白布局"
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/error"
         android:layout_alignParentRight="true"/>
     <Button
-        android:text="content"
+        android:text="自定义布局"
+        android:id="@+id/custom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/empty"
+        android:layout_alignParentRight="true"/>
+    <Button
+        android:text="正文内容"
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

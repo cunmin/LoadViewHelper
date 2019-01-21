@@ -16,4 +16,6 @@ public interface StateChangeListener {
 
     void onShowError(int oldState,View fromView,View errorView);
 
+    void onCustom(int oldState,int newState,View fromView,View customView);
+
 }

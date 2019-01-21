@@ -1,6 +1,8 @@
 package com.littleyellow.loadviewhelper;
 
 import android.content.Context;
+import android.support.annotation.IntRange;
+import android.support.annotation.LayoutRes;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +15,11 @@ import android.widget.FrameLayout;
 
 public class LoadViewHelper {
 
-    public static final int STATE_ERROR = 3;
+    public static final int STATE_ERROR = -3;
 
-    public static final int STATE_EMPTY = 2;
+    public static final int STATE_EMPTY = -2;
 
-    public static final int STATE_LOADING = 1;
+    public static final int STATE_LOADING = -1;
 
     public static final int STATE_CONTENT = 0;
 
@@ -25,128 +27,76 @@ public class LoadViewHelper {
 
     private StateChangeListener stateChangeListener;
 
-//    private View emptyView,errorView,loadView;
-
     private SparseArray<View> views = new SparseArray<>();
 
-    private int loadLayoutRes;
+    private SparseArray<Integer> layoutRes;
 
-    private int emptyLayoutRes;
-
-    private int errorLayoutRes;
-
-
+//    private int loadLayoutRes;
+//
+//    private int emptyLayoutRes;
+//
+//    private int errorLayoutRes;
 
     private int state = STATE_CONTENT;
 
+    private ViewGroup container;
+
+    private FrameLayout frameLayout;
+
     private LoadViewHelper(Builder builder) {
-        loadLayoutRes = builder.loadLayoutRes;
-        emptyLayoutRes = builder.emptyLayoutRes;
-        errorLayoutRes = builder.errorLayoutRes;
+        layoutRes = builder.layoutRes;
         stateChangeListener = builder.stateChangeListener;
-        if(null==layoutListener){
-            layoutListener = new DefaultSettingCallBack() {
-                @Override
-                public int loadLayoutRes() {
-                    return 0;
-                }
-
-                @Override
-                public int emptyLayoutRes() {
-                    return 0;
-                }
-
-                @Override
-                public int errorLayoutRes() {
-                    return 0;
-                }
-
-                @Override
-                public StateChangeListener stateChangeListener() {
-                    return new DefaultStateChangeListener();
-                }
-            };
+        if(null!=layoutListener) {
+            if (0 == builder.loadLayoutRes) {
+                builder.loadLayoutRes = layoutListener.loadLayoutRes();
+            }
+            if (0 == builder.emptyLayoutRes) {
+                builder.emptyLayoutRes = layoutListener.emptyLayoutRes();
+            }
+            if (0 == builder.errorLayoutRes) {
+                builder.errorLayoutRes = layoutListener.errorLayoutRes();
+            }
+            if(null == stateChangeListener){
+                stateChangeListener = layoutListener.stateChangeListener();
+            }
         }
-        if(0 == loadLayoutRes){
-            loadLayoutRes = layoutListener.loadLayoutRes();
-        }
-        if(0 == emptyLayoutRes){
-            emptyLayoutRes = layoutListener.emptyLayoutRes();
-        }
-        if(0 == errorLayoutRes){
-            errorLayoutRes = layoutListener.errorLayoutRes();
-        }
-        if(null == stateChangeListener){
-            stateChangeListener = layoutListener.stateChangeListener();
-        }
+        layoutRes.put(STATE_LOADING,builder.loadLayoutRes);
+        layoutRes.put(STATE_EMPTY,builder.emptyLayoutRes);
+        layoutRes.put(STATE_ERROR,builder.errorLayoutRes);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    public LoadViewHelper attach(ViewGroup container){
+    public LoadViewHelper attach(final ViewGroup container){
+        this.container = container;
         Context context = container.getContext();
-
         int count = container.getChildCount();
-        if(count>1){
+        if(count > 1){
             throw new IllegalArgumentException("子控件数超过1");
         }
-
-        View emptyView = null;
-        if(0==emptyLayoutRes){
-             throw new IllegalArgumentException("请设置空布局资源或者设置全局的空布局资源");
-        }else{
-            emptyView = LayoutInflater.from(context).inflate(emptyLayoutRes, container, false);
-        }
-        View errorView = null;
-        if(0==errorLayoutRes){
-            throw new IllegalArgumentException("请设置错误布局资源或者设置全局的错误布局资源");
-        }else{
-            errorView = LayoutInflater.from(context).inflate(errorLayoutRes, container, false);
-        }
-        View loadView = null;
-        if(0==loadLayoutRes){
-            throw new IllegalArgumentException("请设置加载布局资源或者设置全局的加载布局资源");
-        }else{
-            loadView  =  LayoutInflater.from(context).inflate(loadLayoutRes, container, false);
-        }
-
         if(null==stateChangeListener){
             stateChangeListener = new DefaultStateChangeListener();
         }
 
         View contentView = container.getChildAt(0);
+        frameLayout = new FrameLayout(context);
         if(null!=contentView){
             container.removeView(contentView);
-            FrameLayout frameLayout = new FrameLayout(context);
             container.addView(frameLayout,getMatchParentLayoutParams());
             frameLayout.addView(contentView);
-            frameLayout.addView(emptyView,getMatchParentLayoutParams());
-            frameLayout.addView(errorView,getMatchParentLayoutParams());
-            frameLayout.addView(loadView,getMatchParentLayoutParams());
-
-            views.put(STATE_EMPTY,emptyView);
-            views.put(STATE_ERROR,errorView);
-            views.put(STATE_LOADING,loadView);
             views.put(STATE_CONTENT,contentView);
-            hideOtherViews(STATE_CONTENT);
-//            showContent();
+        }else{
+            container.addView(frameLayout,getMatchParentLayoutParams());
         }
         return this;
     }
 
-    private ViewGroup.LayoutParams getMatchParentLayoutParams(){
-        return new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-    }
-
 
     public void showEmpty() {
-        View contentView = views.get(STATE_CONTENT);
-        if(state==STATE_EMPTY||null==contentView){
-            return;
-        }
-        hideOtherViews(STATE_EMPTY);
+        int emptyLayoutRes = layoutRes.get(STATE_EMPTY);
+        hideOtherViews(STATE_EMPTY,emptyLayoutRes);
         View showView = views.get(state);
         View emptyView = views.get(STATE_EMPTY);
         stateChangeListener.onShowEmpty(state,showView,emptyView);
@@ -154,11 +104,8 @@ public class LoadViewHelper {
     }
 
     public void showError() {
-        View contentView = views.get(STATE_CONTENT);
-        if(state==STATE_ERROR||null==contentView){
-            return;
-        }
-        hideOtherViews(STATE_ERROR);
+        int res = layoutRes.get(STATE_ERROR);
+        hideOtherViews(STATE_ERROR,res);
         View showView = views.get(state);
         View errorView = views.get(STATE_ERROR);
         stateChangeListener.onShowError(state,showView,errorView);
@@ -166,11 +113,8 @@ public class LoadViewHelper {
     }
 
     public void showLoading() {
-        View contentView = views.get(STATE_CONTENT);
-        if(state==STATE_LOADING||null==contentView){
-            return;
-        }
-        hideOtherViews(STATE_LOADING);
+        int res = layoutRes.get(STATE_LOADING);
+        hideOtherViews(STATE_LOADING,res);
         View showView = views.get(state);
         View loadView = views.get(STATE_LOADING);
         stateChangeListener.onShowLoad(state,showView,loadView);
@@ -178,20 +122,23 @@ public class LoadViewHelper {
     }
 
     public void showContent() {
-//        for (int i=0;i<views.size();i++) {
-//            int state = views.keyAt(i);
-//            if(this.state!=state){
-//                views.valueAt(i).setVisibility(GONE);
-//            }
-//        }
-        View contentView = views.get(STATE_CONTENT);
-        if(state==STATE_CONTENT||null==contentView){
-            return;
-        }
-        hideOtherViews(STATE_CONTENT);
+        hideOtherViews(STATE_CONTENT,0);
         View showView = views.get(state);
+        View contentView = views.get(STATE_CONTENT);
         stateChangeListener.onShowContent(state,showView,contentView);
         state = STATE_CONTENT;
+    }
+
+    public void showCustom(int state) {
+        int res = layoutRes.get(state,-4);
+        if(-4 == res){
+            throw new IllegalArgumentException("请添加状态为"+state+"对应的布局资源");
+        }
+        hideOtherViews(state,res);
+        View showView = views.get(this.state);
+        View customView = views.get(state);
+        stateChangeListener.onCustom(state,state,showView,customView);
+        this.state = state;
     }
 
 
@@ -200,21 +147,22 @@ public class LoadViewHelper {
         private int emptyLayoutRes;
         private int errorLayoutRes;
         private StateChangeListener stateChangeListener;
+        private SparseArray<Integer> layoutRes = new SparseArray<>();
 
         private Builder() {
         }
 
-        public Builder loadLayoutRes(int loadLayoutRes) {
+        public Builder loadLayoutRes(@LayoutRes int loadLayoutRes) {
             this.loadLayoutRes = loadLayoutRes;
             return this;
         }
 
-        public Builder emptyLayoutRes(int emptyLayoutRes) {
+        public Builder emptyLayoutRes(@LayoutRes int emptyLayoutRes) {
             this.emptyLayoutRes = emptyLayoutRes;
             return this;
         }
 
-        public Builder errorLayoutRes(int errorLayoutRes) {
+        public Builder errorLayoutRes(@LayoutRes int errorLayoutRes) {
             this.errorLayoutRes = errorLayoutRes;
             return this;
         }
@@ -224,23 +172,62 @@ public class LoadViewHelper {
             return this;
         }
 
+        public Builder addCustomLayout(@IntRange(from = 1) int state, @LayoutRes int LayoutRes) {
+            layoutRes.put(state,LayoutRes);
+            return this;
+        }
+
         public LoadViewHelper build() {
             return new LoadViewHelper(this);
         }
     }
 
-    public static void addDefaultLayoutListener(DefaultSettingCallBack listener){
+    public static void DefaultLayoutListener(DefaultSettingCallBack listener){
         layoutListener = listener;
     }
 
-    private void hideOtherViews(int exceptState){
+    public int getState(){
+        return state;
+    }
+
+    private View hideOtherViews(int exceptState,int layoutRes){
+        boolean isInflate = true;
         for (int i=0;i<views.size();i++) {
             int state = views.keyAt(i);
-            if(STATE_CONTENT!=state && exceptState!=state) {
-                views.valueAt(i).setVisibility(View.GONE);
-            }else{
-                views.valueAt(i).setVisibility(View.VISIBLE);
+            View view = views.valueAt(i);
+            if(null != view) {
+                if (exceptState==state || STATE_CONTENT==state) {
+                    view.setVisibility(View.VISIBLE);
+                } else {
+                    view.setVisibility(View.GONE);
+                }
+            }else if(STATE_CONTENT!=state){
+                isInflate = false;
             }
         }
+        View exceptView = views.get(exceptState);
+        if(!isInflate || null==exceptView) {
+            addLayout(exceptState, layoutRes);
+        }
+        return exceptView;
+    }
+
+    private void addLayout(int state,int layoutRes){
+        try {
+            if(STATE_CONTENT == state){
+                return;
+            }
+            Context context = container.getContext();
+            View view  =  LayoutInflater.from(context).inflate(layoutRes, container, false);
+            frameLayout.addView(view,getMatchParentLayoutParams());
+            views.put(state,view);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("请设置布局资源");
+        }
+    }
+
+    private ViewGroup.LayoutParams getMatchParentLayoutParams(){
+        return new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     }
 }
