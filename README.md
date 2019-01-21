@@ -1,5 +1,5 @@
 # LoadViewHelper
-布局切换库，加载、空白、错误，可自定义布局类型。
+布局切换库，加载、空白、错误，可自定义布局类型。 
 ![展示](https://raw.githubusercontent.com/cunmin/LoadViewHelper/master/5wbex-chpku.gif)
 ## Setup
 
