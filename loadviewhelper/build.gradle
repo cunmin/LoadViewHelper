@@ -26,6 +26,22 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     testCompile 'junit:junit:4.12'
+}
+apply plugin: 'com.novoda.bintray-release'
+publish{
+    repoName = 'maven'//远程仓库名字,不指明，默认是上传到maven
+    userOrg = 'littleyellow'//bintray.com的用户名
+    groupId = 'com.littleyellow'//一个唯一值，默认包名,生成的gradle依赖前缀
+    artifactId = 'loadviewhelper'//远程仓库包名称
+    publishVersion = '1.0.0'//版本号
+    desc = '布局切换库，加载、空白、错误，可自定义布局类型。'//描述，不重要
+    website = 'https://github.com/cunmin/LoadViewHelper'//引用github主页
+}
+
+tasks.withType(Javadoc) {//防止编码问题
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
 }
