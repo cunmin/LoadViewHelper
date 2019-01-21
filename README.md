@@ -19,7 +19,7 @@ dependencies {
 ```
 
 ## Usage
-- 1.添加全局布局资源，不强制一定添加全局资源，可创建LoadViewHelper时在设置
+- 1.添加全局布局资源，不强制一定添加全局资源，可创建LoadViewHelper时再设置
 ```
 public static class SettingCallBack implements DefaultSettingCallBack {
 
